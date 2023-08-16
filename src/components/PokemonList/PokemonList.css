@@ -1,4 +1,17 @@
 .pokemon-list-wrapper{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin: 2rem auto;
+}
+.pokemon-list-wrapper{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    height: 400px;
 
+}
+.contorls > button{
+    padding:20px;
 }

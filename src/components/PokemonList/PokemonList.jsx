@@ -2,29 +2,37 @@ import { useState } from "react";
 import { useEffect } from "react";
 import axios from 'axios'
 import "./pokemonList.css"
+import Pokemon from "../pokemon/pokemon";
 
 function PokemonList(){
 
     const [pokemonList, setPokemonList] = useState([]);
     const [isLoading, setIsLoading] =useState(true);
 
-
+        const POKEDEX_URL = "https://pokeapi.co/api/v2/pokemon"; // this daunlods list of 20 pokemon
         async function downloadPokemon(){
-            const response = axios.get("https://pokeapi.co/api/v2/pokemon")
-            const pokemonResults = (await response).data.results
-            const pokemonResultPromise = pokemonResults.map((pokemon) => axios.get(pokemon.url))
-            const pokemonData = await axios.all(pokemonResultPromise)
+            // passing the array axious all
+            const response = axios.get(POKEDEX_URL)
+            const pokemonResults = (await response).data.results; // we get the array of pokemons from result
+            const pokemonResultPromise = pokemonResults.map((pokemon) => axios.get(pokemon.url));
+            console.log((await response).data);
+
+            // iterating over the array of pokemons, and using heir url, to create an array of prmmises
+            // that willl daunlod those 20 pokemons
+            const pokemonData = await axios.all(pokemonResultPromise) //array of 20 pokemon detailed data
             console.log(await pokemonData);
-            const res = pokemonData.map((pokeData) => {
+            // now iterate on the data of each pokemonand extract id, name, image, types
+            const pokeListResult = pokemonData.map((pokeData) => {
                 const pokemon = pokeData.data;
                 return {
+                    id: pokemon.id,
                     name: pokemon.name, 
-                    image: (pokemon.sprites.other) ? pokemon.sprites.dream_world.front_default : pokemon.sprites.front_shiny,
+                    image: (pokemon.sprites.other) ? pokemon.sprites.other.dream_world.front_default : pokemon.sprites.front_shiny,
                     types: pokemon.types
                     }
             })
-            console.log(res);
-            setPokemonList(res);
+            console.log(pokeListResult);
+            setPokemonList(pokeListResult);
             setIsLoading(false)
         }
 
@@ -34,8 +42,15 @@ function PokemonList(){
     
     return(
         <div className="pokemon-list-wrapper">
-                <div>pokemonList </div>
-                {(isLoading) ? 'Loading...' : 'Data_downloaded'}
+                <div>pokemon List</div>
+                {(isLoading) ? 'Loading...':
+                    pokemonList.map((p) => <Pokemon name= {p.name} image = {p.image} key = {p.key}/> )
+                    }
+
+                <div className="contorls">
+                    <button>Next</button>
+                    <button>Prev</button>
+                </div>
         </div>
     )
 }
